@@ -29,3 +29,11 @@ desc spare_parts;
 alter table vehicles add column color varchar(20);
 
 alter table spare_parts add column code varchar(20) after id;
+
+create table users(
+    id int auto_increment,
+    username varchar(50),
+    email varchar(100),
+    password varchar(255),
+    PRIMARY KEY(id)
+);
