@@ -10,27 +10,37 @@ const connection = mysql.createConnection({
 connection.connect();
 
 const saveUser = (req, res) => {
-  // connect db and save record
   const { username, email, password } = req.body;
   const bcrypt = require("bcrypt");
   const saltRounds = 10;
 
-  // Hash the password
   bcrypt.genSalt(saltRounds, function (err, salt) {
+    if (err) {
+      console.error("Salt generation error:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
     bcrypt.hash(password, salt, function (err, hash) {
-      if (err) throw err;
-      password = hash;
+      if (err) {
+        console.error("Hashing error:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      // Now use the hashed password
+      connection.query(
+        "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+        [username, email, hash],
+        (err, rows) => {
+          if (err) {
+            console.error("DB insert error:", err);
+            return res.status(500).json({ error: "Database Error" });
+          }
+
+          res.json({ message: "User registration successful!" });
+        }
+      );
     });
   });
-
-  connection.query(
-    "insert into users(username, email, password) values(?, ?, ?)",
-    [username, email, password],
-    (err, rows) => {
-      if (err) throw err;
-      res.json({ message: "User registration Successful!" });
-    }
-  );
 };
 
 module.exports = {
