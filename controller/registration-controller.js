@@ -24,7 +24,7 @@ const saveUser = (req, res) => {
   });
 
   connection.query(
-    "insert into user(username, email, password) values(?, ?, ?)",
+    "insert into users(username, email, password) values(?, ?, ?)",
     [username, email, password],
     (err, rows) => {
       if (err) throw err;
