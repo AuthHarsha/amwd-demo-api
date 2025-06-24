@@ -1,4 +1,5 @@
 const express = require("express");
+var cors = require("cors");
 
 const coustomerRoute = require("./routes/coustomer-route");
 const itemRoute = require("./routes/item-route");
@@ -6,6 +7,7 @@ const loginRoute = require("./routes/login-route");
 const registrationRoute = require("./routes/registration-route");
 
 const app = express();
+app.use(cors());
 const port = 3000;
 
 // parse application/x-www-form-urlencoded

@@ -10,6 +10,7 @@ const connection = mysql.createConnection({
 connection.connect();
 
 const saveUser = (req, res) => {
+  res.json(req);
   // connect db and save record
   const { username, email, password } = req.body;
   const bcrypt = require("bcrypt");
