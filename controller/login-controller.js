@@ -1,4 +1,6 @@
 const mysql = require("mysql2");
+const bcrypt = require("bcrypt");
+const { generateToken } = require("../utils/jwt-utils");
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -8,8 +10,6 @@ const connection = mysql.createConnection({
 });
 
 connection.connect();
-
-const bcrypt = require("bcrypt");
 
 const searchUser = (req, res) => {
   const { email, password } = req.body;
@@ -43,8 +43,18 @@ const searchUser = (req, res) => {
           return res.status(401).json({ error: "Invalid email or password" });
         }
 
-        // 3. Password is correct — login successful
-        res.json({ message: "Login successful" });
+        // 3. Password is correct — generate JWT token and login successful
+        const token = generateToken(user.id, user.email);
+
+        res.json({
+          message: "Login successful",
+          token: token,
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+          },
+        });
       });
     }
   );

@@ -1,4 +1,6 @@
 const mysql = require("mysql2");
+const bcrypt = require("bcrypt");
+const { generateToken } = require("../utils/jwt-utils");
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -11,7 +13,6 @@ connection.connect();
 
 const saveUser = (req, res) => {
   const { username, email, password } = req.body;
-  const bcrypt = require("bcrypt");
   const saltRounds = 10;
 
   bcrypt.genSalt(saltRounds, function (err, salt) {
@@ -30,13 +31,24 @@ const saveUser = (req, res) => {
       connection.query(
         "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
         [username, email, hash],
-        (err, rows) => {
+        (err, result) => {
           if (err) {
             console.error("DB insert error:", err);
             return res.status(500).json({ error: "Database Error" });
           }
 
-          res.json({ message: "User registration successful!" });
+          // Generate JWT token for the newly registered user
+          const token = generateToken(result.insertId, email);
+
+          res.json({
+            message: "User registration successful!",
+            token: token,
+            user: {
+              id: result.insertId,
+              username: username,
+              email: email,
+            },
+          });
         }
       );
     });
